@@ -103,9 +103,40 @@ func (server *Server) updateJob(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	// TODO: get the job then check if the value if empty if empty update to existing one
 
-	job, err := server.store.UpdateJob(ctx, db.UpdateJobParams{
+	job, err := server.store.GetJob(ctx, uri.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	if req.Description == "" {
+		req.Description = job.Description
+	}
+	if req.ClientName == "" {
+		req.ClientName = job.ClientName
+	}
+	if req.ClientAddress == "" {
+		req.ClientAddress = job.ClientAddress
+	}
+	if req.ClientEmail == "" {
+		req.ClientEmail = job.ClientEmail
+	}
+	if req.Price == 0 {
+		req.Price = job.Price
+	}
+	if req.StartDate.IsZero() {
+		req.StartDate = job.StartDate
+	}
+	if req.EndDate.IsZero() {
+		req.EndDate = job.EndDate
+	}
+
+	updatedJob, err := server.store.UpdateJob(ctx, db.UpdateJobParams{
 		Description:   req.Description,
 		ClientName:    req.ClientName,
 		ClientAddress: req.ClientAddress,
@@ -120,7 +151,7 @@ func (server *Server) updateJob(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, job)
+	ctx.JSON(http.StatusOK, updatedJob)
 }
 
 type deleteJobRequestURI struct {

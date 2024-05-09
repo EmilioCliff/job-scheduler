@@ -31,9 +31,14 @@ server:
 build:
 	cd go-backend && docker build -t goimage:latest .
 
-# Run go docker 
+# Create a network and add the postgres into in
+connect:
+	docker network create job-scheduler-network && \
+	docker network connect job-scheduler-network postgres1
+
+# Run go image to create a container running in the same network as postgres
 run:
-	docker run --name go-cont -d -p 8080:8080 goimage:latest 
+	docker run --name go-cont --network job-scheduler-network -d -p 8080:8080 goimage:latest 
 
 lint:
 	cd go-backend && golangci-lint run --enable-all
