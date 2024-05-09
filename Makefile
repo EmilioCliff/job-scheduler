@@ -27,7 +27,15 @@ sqlc:
 server:
 	cd go-backend && go run main.go
 
+# Build go docker image
+build:
+	cd go-backend && docker build -t goimage:latest .
+
+# Run go docker 
+run:
+	docker run --name go-cont -d -p 8080:8080 goimage:latest 
+
 lint:
 	cd go-backend && golangci-lint run --enable-all
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc server
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc server lint build run
