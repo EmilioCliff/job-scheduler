@@ -30,4 +30,4 @@ server:
 lint:
 	cd go-backend && golangci-lint run --enable-all
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc server
